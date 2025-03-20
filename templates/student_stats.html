@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">📊 Моя статистика успішності</h2>
+
+    <!-- Загальна статистика -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-3">📈 Загальні показники</h4>
+            <div class="row">
+                <!-- Середній бал -->
+                <div class="col-md-4 mb-3">
+                    <div class="p-3 rounded bg-light">
+                        <h5>Середній бал</h5>
+                        <div class="display-4 {% if overall_avg >= 10 %}text-success{% else %}text-warning{% endif %}">
+                            {{ overall_avg }}
+                        </div>
+                        <small class="text-muted">
+                            {% if overall_avg >= 10 %}Відмінно!{% else %}Можна краще!{% endif %}
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Кількість оцінок -->
+                <div class="col-md-4 mb-3">
+                    <div class="p-3 rounded bg-light">
+                        <h5>Кількість оцінок</h5>
+                        <div class="display-4">{{ grades|length }}</div>
+                        <small class="text-muted">За весь період</small>
+                    </div>
+                </div>
+
+                <!-- Відсоток успішних оцінок -->
+                <div class="col-md-4 mb-3">
+                    <div class="p-3 rounded bg-light">
+                        <h5>Успішні оцінки</h5>
+                        <div class="display-4">{{ success_percentage }}%</div>
+                        <small class="text-muted">Оцінки що вище 7</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Динаміка оцінок -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-3">📉 Динаміка оцінок</h4>
+            <canvas id="gradesChart"></canvas>
+        </div>
+    </div>
+
+    <div class="card shadow mt-4">
+        <div class="card-body">
+            <h4 class="card-title mb-3">📚 Деталізація по предметам</h4>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Предмет</th>
+                            <th>Середній бал</th>
+                            <th>Остання оцінка</th>
+                            <th>Тенденція</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for subject, data in subjects_stats.items() %}
+                        <tr>
+                            <td>{{ subject }}</td>
+                            <td>
+                                <span class="badge {% if data.average >= 10 %}bg-success{% else %}bg-warning{% endif %}">
+                                    {{ data.average }}
+                                </span>
+                            </td>
+                            <td>{{ data.last_grade }}</td>
+                            <td>
+                                {% if data.trend == 'up' %}
+                                    <span class="text-success fs-5">↑</span>
+                                {% elif data.trend == 'down' %}
+                                    <span class="text-danger fs-5">↓</span>
+                                {% elif data.trend == 'stable' %}
+                                    <span class="text-secondary fs-5">→</span>
+                                {% else %}
+                                    <span class="text-muted fs-5">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Підключення Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Дані для графіка
+    const labels = JSON.parse('{{ dates | tojson | safe }}');
+    const dataPoints = JSON.parse('{{ grades_list | tojson | safe }}');
+
+    // Ініціалізація графіка
+    const ctx = document.getElementById('gradesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Оцінки',
+                data: dataPoints,
+                borderColor: '#4e73df',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 12
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Оцінки з предмету: {{ subject.name }}</h2>
+    <a href="{{ url_for('routes.dashboard') }}" class="btn btn-secondary mb-3">Назад</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Студент</th>
+                <th>Оцінка</th>
+                <th>Дата</th>
+                <th>Коментар</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for grade in grades %}
+            <tr>
+                <td>{{ grade.student.full_name }}</td>
+                <td>{{ grade.grade }}</td>
+                <td>{{ grade.date.strftime('%d.%m.%Y') }}</td>
+                <td>{{ grade.comment or "-" }}</td>
+                <td>
+                    <a href="{{ url_for('routes.edit_grade', grade_id=grade.id) }}" 
+                       class="btn btn-sm btn-warning">Редагувати</a>
+                    <form method="POST" 
+                          action="{{ url_for('routes.delete_grade', grade_id=grade.id) }}" 
+                          style="display: inline;">
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Видалити оцінку?')">Видалити</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

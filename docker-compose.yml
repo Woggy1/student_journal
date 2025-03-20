@@ -1,0 +1,49 @@
+version: "3.8"
+services:
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: student_journal
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  flyway:
+    image: flyway/flyway:11.4.0-alpine
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/flyway/sql
+    environment:
+      FLYWAY_URL: jdbc:mysql://db:3306/student_journal?allowPublicKeyRetrieval=true
+      FLYWAY_USER: user
+      FLYWAY_PASSWORD: password
+      FLYWAY_BASELINE_ON_MIGRATE: "true"
+    command: migrate
+
+  web:
+    build: .
+    restart: always
+    depends_on:
+      - db
+      - flyway
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_APP: app.py
+      FLASK_ENV: development
+      DATABASE_URL: mysql+pymysql://user:password@db/student_journal
+
+volumes:
+  mysql_data:

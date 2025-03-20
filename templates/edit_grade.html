@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Редагування оцінки</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label>Оцінка (1-12)</label>
+            <input type="number" name="grade" class="form-control" 
+                   value="{{ grade.grade }}" min="1" max="12" required>
+        </div>
+        <div class="mb-3">
+            <label>Дата</label>
+            <input type="date" name="date" class="form-control" 
+                   value="{{ grade.date.strftime('%Y-%m-%d') }}" required>
+        </div>
+        <div class="mb-3">
+            <label>Коментар</label>
+            <textarea name="comment" class="form-control">{{ grade.comment }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Зберегти</button>
+        <a href="{{ url_for('routes.subject_grades', subject_id=grade.subject_id) }}" 
+           class="btn btn-secondary">Скасувати</a>
+    </form>
+</div>
+
+{% endblock %}

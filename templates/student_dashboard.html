@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="mb-3">
+        <a href="{{ url_for('routes.edit_profile') }}" class="btn btn-warning">Редагувати профіль</a>
+    </div>
+    <h2 class="mb-4">Мої оцінки</h2>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Предмет</th>
+                    <th>Оцінка</th>
+                    <th>Викладач</th>
+                    <th>Контакт</th>
+                    <th>Дата</th>
+                    <th>Коментар</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for grade in grades %}
+                <tr>
+                    <td>{{ grade.subject.name }}</td>
+                    <td>{{ grade.grade }}</td>
+                    <td>{{ grade.subject.teacher.full_name }}</td>
+                    <td>
+                        <a href="mailto:{{ grade.subject.teacher.email }}" 
+                           class="text-decoration-none">
+                            {{ grade.subject.teacher.email }}
+                        </a>
+                    </td>
+                    <td>{{ grade.date.strftime('%d.%m.%Y') }}</td>
+                    <td>{{ grade.comment or "-" }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center">Оцінок немає</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Додати цей блок десь у відповідному місці -->
+   <a href="{{ url_for('routes.student_stats') }}" class="btn btn-info mb-3">
+    📊 Переглянути мою статистику
+    </a>
+
+    <!-- Додано блок для навчальних матеріалів -->
+    <h3 class="mt-5">Навчальні матеріали</h3>
+    {% for subject in current_user.group.subjects %}
+        <div class="mb-4">
+            <h4>{{ subject.name }}</h4>
+            <ul class="list-group">
+                {% for material in subject.materials %}
+                    <li class="list-group-item">
+                        <h5>{{ material.title }}</h5>
+                        <p>{{ material.description }}</p>
+                        {% if material.file_path %}
+                            <a href="{{ url_for('static', filename=material.file_path) }}" 
+                               class="btn btn-sm btn-primary"
+                               download>
+                                Завантажити
+                            </a>
+                        {% endif %}
+                    </li>
+                {% else %}
+                    <li class="list-group-item">Матеріалів немає</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

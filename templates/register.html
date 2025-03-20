@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Реєстрація</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label">Повне ім'я</label>
+            <input type="text" name="full_name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Пароль</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Роль</label>
+            <select name="role" class="form-select" required id="roleSelect" onchange="toggleGroupField()">
+                <option value="student">Студент</option>
+                <option value="teacher">Викладач</option>
+            </select>
+        </div>
+        <div class="mb-3" id="groupField" style="display: none;">
+            <label class="form-label">Назва групи (наприклад, І-11)</label>
+            <input type="text" name="group_name" class="form-control" placeholder="Введіть назву групи">
+        </div>
+        <button type="submit" class="btn btn-success">Зареєструватися</button>
+    </form>
+</div>
+
+<script>
+    function toggleGroupField() {
+        const roleSelect = document.getElementById('roleSelect');
+        const groupField = document.getElementById('groupField');
+        groupField.style.display = roleSelect.value === 'student' ? 'block' : 'none';
+    }
+    document.addEventListener('DOMContentLoaded', toggleGroupField);
+</script>
+{% endblock %}

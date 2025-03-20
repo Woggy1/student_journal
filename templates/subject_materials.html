@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">{{ subject.name }} - Навчальні матеріали</h2>
+
+    <!-- Секція матеріалів -->
+    <div class="card shadow mb-5">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="card-title">📚 Навчальні матеріали</h3>
+                <a href="{{ url_for('routes.add_material', subject_id=subject.id) }}" 
+                   class="btn btn-primary">
+                   ➕ Додати матеріал
+                </a>
+            </div>
+
+            {% if materials %}
+                <div class="list-group">
+                    {% for material in materials %}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h5 class="mb-1">{{ material.title }}</h5>
+                                <p class="mb-1">{{ material.description }}</p>
+                                <small class="text-muted">
+                                    Додано: {{ material.created_at.strftime('%d.%m.%Y %H:%M') }}
+                                </small>
+                            </div>
+                            <div class="btn-group">
+                                {% if material.file_path %}
+                                <a href="{{ url_for('static', filename=material.file_path) }}" 
+                                   class="btn btn-sm btn-success"
+                                   download>
+                                   ⬇️ Завантажити
+                                </a>
+                                {% endif %}
+                                <form method="POST" 
+                                      action="{{ url_for('routes.delete_material', material_id=material.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-danger ms-2">
+                                        ❌ Видалити
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info mt-3">
+                    Наразі немає доданих матеріалів
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Секція оцінок -->
+    <div class="card shadow">
+        <div class="card-body">
+            <h3 class="card-title mb-4">📊 Виставлені оцінки</h3>
+            
+            {% if grades %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Студент</th>
+                                <th>Оцінка</th>
+                                <th>Дата</th>
+                                <th>Коментар</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for grade, student_name in grades %}
+                            <tr>
+                                <td>{{ student_name }}</td>
+                                <td>
+                                    <span class="badge bg-primary rounded-pill">
+                                        {{ grade.grade }}
+                                    </span>
+                                </td>
+                                <td>{{ grade.date.strftime('%d.%m.%Y') }}</td>
+                                <td class="fst-italic text-muted">
+                                    {{ grade.comment or "—" }}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('routes.subject_grades', subject_id=grade.subject_id) }}" 
+                                       class="btn btn-sm btn-outline-warning">
+                                       ✏️ Деталі
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mt-3">
+                    Ще не виставлено жодної оцінки
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

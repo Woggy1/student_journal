@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Вхід</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Пароль</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Увійти</button>
+    </form>
+    <div class="mt-3">
+        Немає акаунта? <a href="{{ url_for('routes.register') }}">Зареєструватися</a>
+    </div>
+</div>
+{% endblock %}

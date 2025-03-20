@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Редагування профілю</h2>
+    <form method="post">
+        <!-- Існуючі поля (ім'я, email, пароль) -->
+        <div class="mb-3">
+            <label>Повне ім'я</label>
+            <input type="text" name="full_name" class="form-control" 
+                   value="{{ current_user.full_name }}" required>
+        </div>
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="email" name="email" class="form-control"
+                   value="{{ current_user.email }}" required>
+        </div>
+        {% if current_user.role == 'student' %}
+        <div class="mb-3">
+            <label>Оберіть групу або введіть нову</label>
+            <select name="group_action" id="groupAction" class="form-select mb-2" onchange="toggleGroupInput()">
+                <option value="existing">Обрати зі списку</option>
+                <option value="new">Ввести нову групу</option>
+            </select>
+            
+            <!-- Випадаючий список існуючих груп -->
+            <div id="existingGroupSection">
+                <select name="group_id" class="form-select" required>
+                    {% for group in groups %}
+                        <option value="{{ group.id }}" {% if group.id == current_user.group_id %}selected{% endif %}>{{ group.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Поле для нової групи -->
+            <div id="newGroupSection" style="display: none;">
+                <input type="text" name="new_group_name" class="form-control" placeholder="Назва нової групи">
+            </div>
+        </div>
+        {% endif %}
+        <div class="mb-3">
+            <label>Новий пароль (залиште порожнім, щоб не змінювати)</label>
+            <input type="password" name="password" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary">Зберегти</button>
+    </form>
+</div>
+
+<script>
+    function toggleGroupInput() {
+        const action = document.getElementById('groupAction').value;
+        document.getElementById('existingGroupSection').style.display = action === 'existing' ? 'block' : 'none';
+        document.getElementById('newGroupSection').style.display = action === 'new' ? 'block' : 'none';
+        
+        // Зробити поле нової групи необов'язковим, якщо обрано існуючу
+        document.querySelector('select[name="group_id"]').required = (action === 'existing');
+        document.querySelector('input[name="new_group_name"]').required = (action === 'new');
+    }
+</script>
+{% endblock %}

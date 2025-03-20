@@ -1,0 +1,35 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Викладацький кабінет</h2>
+    <div class="mb-4">
+        <a href="{{ url_for('routes.add_subject') }}" class="btn btn-success">Додати предмет</a>
+        <a href="{{ url_for('routes.add_grade') }}" class="btn btn-primary">Виставити оцінку</a>
+        <a href="{{ url_for('routes.edit_profile') }}" class="btn btn-warning">Редагувати профіль</a>
+    </div>
+    
+    <h4>Мої предмети:</h4>
+    <ul class="list-group">
+        {% for subject in subjects %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('routes.subject_materials', subject_id=subject.id) }}">
+                {{ subject.name }} (Група: {{ subject.group.name }})
+            </a>
+            <div>
+                <a href="{{ url_for('routes.add_material', subject_id=subject.id) }}" 
+                   class="btn btn-sm btn-success me-2">
+                    Додати матеріал
+                </a>
+                <form method="POST" action="{{ url_for('routes.delete_subject', subject_id=subject.id) }}">
+                    <button type="submit" class="btn btn-danger btn-sm" 
+                            onclick="return confirm('Ви впевнені? Всі оцінки з цього предмету будуть видалені!')">
+                        Видалити
+                    </button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

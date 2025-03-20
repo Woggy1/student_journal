@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Додати матеріал до {{ subject.name }}</h2>
+    <form method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label>Назва матеріалу</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Опис (необов'язково)</label>
+            <textarea name="description" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="mb-3">
+            <label>Файл (необов'язково)</label>
+            <input type="file" name="file" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary">Додати</button>
+    </form>
+</div>
+{% endblock %}

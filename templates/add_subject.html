@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Додати предмет</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label>Назва предмету</label>
+            <input type="text" name="subject_name" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Оберіть групу або створіть нову</label>
+            <select name="group_action" id="groupAction" class="form-select mb-2" onchange="toggleGroupInput()">
+                <option value="existing">Обрати існуючу групу</option>
+                <option value="new">Створити нову групу</option>
+            </select>
+
+            <div id="existingGroupSection">
+                <select name="group_id" class="form-select" required>
+                    {% for group in groups %}
+                        <option value="{{ group.id }}">{{ group.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div id="newGroupSection" style="display: none;">
+                <input type="text" name="new_group_name" class="form-control" 
+                       placeholder="Введіть назву нової групи">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Додати</button>
+    </form>
+</div>
+
+<script>
+    function toggleGroupInput() {
+        const action = document.getElementById('groupAction').value;
+        document.getElementById('existingGroupSection').style.display = 
+            action === 'existing' ? 'block' : 'none';
+        document.getElementById('newGroupSection').style.display = 
+            action === 'new' ? 'block' : 'none';
+        
+        document.querySelector('[name="group_id"]').required = action === 'existing';
+        document.querySelector('[name="new_group_name"]').required = action === 'new';
+    }
+</script>
+{% endblock %}

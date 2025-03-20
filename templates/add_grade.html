@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Виставити оцінку</h2>
+    <form method="post" id="gradeForm">
+        <div class="mb-3">
+            <label>Група</label>
+            <select name="group_id" id="groupSelect" class="form-select" required>
+                <option value="">Оберіть групу</option>
+                {% for group in groups %}
+                    <option value="{{ group.id }}">{{ group.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3" id="studentSection" style="display: none;">
+            <label>Студент</label>
+            <select name="student_id" id="studentSelect" class="form-select" required>
+                <option value="">Оберіть студента</option>
+            </select>
+        </div>
+
+        <div class="mb-3" id="subjectSection" style="display: none;">
+            <label>Предмет</label>
+            <select name="subject_id" id="subjectSelect" class="form-select" required>
+                <option value="">Оберіть предмет</option>
+            </select>
+            <div id="noSubjectsAlert" class="alert alert-warning mt-2" style="display: none;">
+                Для цієї групи немає предметів. <a href="{{ url_for('routes.add_subject') }}">Створити предмет</a>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label>Дата</label>
+            <input type="date" name="date" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Оцінка (1-12)</label>
+            <input type="number" name="grade" class="form-control" min="1" max="12" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Коментар</label>
+            <textarea name="comment" class="form-control"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Зберегти</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('groupSelect').addEventListener('change', function() {
+        const groupId = this.value;
+        const studentSection = document.getElementById('studentSection');
+        const subjectSection = document.getElementById('subjectSection');
+        
+        if (groupId) {
+            // Завантажити студентів
+            fetch(`/get_students?group_id=${groupId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const studentSelect = document.getElementById('studentSelect');
+                    studentSelect.innerHTML = '<option value="">Оберіть студента</option>';
+                    data.students.forEach(student => {
+                        studentSelect.innerHTML += `<option value="${student.id}">${student.full_name}</option>`;
+                    });
+                    studentSection.style.display = 'block';
+                });
+
+            // Завантажити предмети
+            fetch(`/get_subjects?group_id=${groupId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const subjectSelect = document.getElementById('subjectSelect');
+                    const noSubjectsAlert = document.getElementById('noSubjectsAlert');
+                    subjectSelect.innerHTML = '<option value="">Оберіть предмет</option>';
+                    if (data.subjects.length === 0) {
+                        noSubjectsAlert.style.display = 'block';
+                        subjectSelect.style.display = 'none';
+                    } else {
+                        noSubjectsAlert.style.display = 'none';
+                        subjectSelect.style.display = 'block';
+                        data.subjects.forEach(subject => {
+                            subjectSelect.innerHTML += `<option value="${subject.id}">${subject.name}</option>`;
+                        });
+                    }
+                    subjectSection.style.display = 'block';
+                });
+        } else {
+            studentSection.style.display = 'none';
+            subjectSection.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}
